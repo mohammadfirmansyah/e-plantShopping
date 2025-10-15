@@ -1,35 +1,79 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeItem, updateQuantity } from './CartSlice';
+import { removeItem, updateQuantity } from './CartSlice'; // Correctly import actions
 import './CartItem.css';
 
 const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
-  // Calculate total amount for all products in the cart
+  /**
+   * Calculates the total amount for all products in the cart.
+   * @returns {string} The total amount formatted to two decimal places.
+   */
   const calculateTotalAmount = () => {
- 
+    let total = 0;
+    cart.forEach(item => {
+      // Remove the '$' sign and convert cost to a number
+      const itemCost = parseFloat(item.cost.substring(1));
+      total += item.quantity * itemCost;
+    });
+    return total.toFixed(2);
   };
 
+  /**
+   * Calls the onContinueShopping prop to navigate back to the product list.
+   * @param {Event} e - The click event.
+   */
   const handleContinueShopping = (e) => {
-   
+    onContinueShopping(e);
   };
 
+  /**
+   * Placeholder function for checkout functionality.
+   */
+  const handleCheckoutShopping = () => {
+    alert('Functionality to be added for future reference');
+  };
 
-
+  /**
+   * Dispatches an action to increase the quantity of an item.
+   * @param {object} item - The cart item to increment.
+   */
   const handleIncrement = (item) => {
+    dispatch(updateQuantity({ name: item.name, quantity: item.quantity + 1 }));
   };
 
+  /**
+   * Dispatches an action to decrease the quantity of an item or remove it if the quantity is 1.
+   * @param {object} item - The cart item to decrement.
+   */
   const handleDecrement = (item) => {
-   
+    if (item.quantity > 1) {
+      dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1 }));
+    } else {
+      // If quantity is 1, dispatch removeItem action
+      dispatch(removeItem(item.name));
+    }
   };
 
+  /**
+   * Dispatches an action to remove an item completely from the cart.
+   * @param {object} item - The cart item to remove.
+   */
   const handleRemove = (item) => {
+    dispatch(removeItem(item.name));
   };
 
-  // Calculate total cost based on quantity for an item
+  /**
+   * Calculates the total cost for a single item based on its quantity.
+   * @param {object} item - The cart item.
+   * @returns {string} The subtotal for the item formatted to two decimal places.
+   */
   const calculateTotalCost = (item) => {
+    const itemCost = parseFloat(item.cost.substring(1));
+    const totalCost = item.quantity * itemCost;
+    return totalCost.toFixed(2);
   };
 
   return (
@@ -57,12 +101,10 @@ const CartItem = ({ onContinueShopping }) => {
       <div className="continue_shopping_btn">
         <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
-        <button className="get-started-button1">Checkout</button>
+        <button className="get-started-button1" onClick={handleCheckoutShopping}>Checkout</button>
       </div>
     </div>
   );
 };
 
 export default CartItem;
-
-
